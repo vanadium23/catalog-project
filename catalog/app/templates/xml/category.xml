@@ -1,0 +1,14 @@
+<category>
+    <id>{{category.id}}</id>
+    <name>{{category.name}}</name>
+    <description>{{category.description}}</description>
+    <items>
+    {% for i in category.items %}
+        <item>
+            <id>{{i.id}}</id>
+            <name>{{i.name}}</name>
+            <description>{{i.description}}</description>
+        </item>
+    {% endfor %}
+    </items>
+</category>

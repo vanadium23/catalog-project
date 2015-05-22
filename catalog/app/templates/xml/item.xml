@@ -1,0 +1,5 @@
+<item>
+    <id>{{item.id}}</id>
+    <name>{{item.name}}</name>
+    <description>{{item.description}}</description>
+</item>
