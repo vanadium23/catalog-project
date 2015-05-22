@@ -45,7 +45,8 @@ def index():
 
 @app.route('/login')
 def login():
-    state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
+    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
+                    for x in xrange(32))
     login_session['state'] = state
     return render_template('login.html',
                            STATE=state,
@@ -179,7 +180,8 @@ def item_store(category_name):
     if 'username' not in login_session:
         return redirect(url_for('login'))
     form = ItemForm()
-    form.category_id.choices = [(c.id, c.name) for c in Category.query.order_by('name')]
+    form.category_id.choices = [(c.id, c.name)
+                                for c in Category.query.order_by('name')]
     category = Category.query.filter(Category.name == category_name).first()
     form.category_id.data = category.id
     if form.validate_on_submit():
@@ -229,7 +231,8 @@ def item_edit(category_name, item_name):
     if item.author_id != login_session['user_id']:
         return render_template('401.html', name='category')
     form = ItemForm()
-    form.category_id.choices = [(c.id, c.name) for c in Category.query.order_by('name')]
+    form.category_id.choices = [(c.id, c.name)
+                                for c in Category.query.order_by('name')]
     delete_form = DeleteForm()
     form.name.data = item.name
     form.description.data = item.description
@@ -241,7 +244,8 @@ def item_edit(category_name, item_name):
                            delete_form=delete_form)
 
 
-@app.route('/catalog/<category_name>/item/<item_name>/update', methods=['POST'])
+@app.route('/catalog/<category_name>/item/<item_name>/update',
+           methods=['POST'])
 def item_update(category_name, item_name):
     if 'username' not in login_session:
         return redirect(url_for('login'))
@@ -252,10 +256,13 @@ def item_update(category_name, item_name):
     if item.author_id != login_session['user_id']:
         return render_template('401.html', name='item')
     form = ItemForm()
-    form.category_id.choices = [(c.id, c.name) for c in Category.query.order_by('name')]
+    form.category_id.choices = [(c.id, c.name)
+                                for c in Category.query.order_by('name')]
     if form.validate_on_submit():
         try:
-            category = Category.query.filter(Category.id == form.category_id.data).first()
+            category = Category.query.\
+                filter(Category.id == form.category_id.data).\
+                first()
             item.name = form.name.data
             item.description = form.description.data
             item.category_id = form.category_id.data
@@ -279,7 +286,8 @@ def item_update(category_name, item_name):
                             item_name=form.name.data))
 
 
-@app.route('/catalog/<category_name>/item/<item_name>/delete', methods=['POST'])
+@app.route('/catalog/<category_name>/item/<item_name>/delete',
+           methods=['POST'])
 def item_delete(category_name, item_name):
     if 'username' not in login_session:
         return redirect(url_for('login'))
@@ -351,7 +359,7 @@ def gconnect():
     stored_credentials = login_session.get('credentials')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_credentials is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
+        response = make_response(json.dumps('User is already connected.'),
                                  200)
         response.headers['Content-Type'] = 'application/json'
         return response

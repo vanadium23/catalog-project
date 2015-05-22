@@ -19,7 +19,9 @@ class Category(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(80), nullable=False, unique=True)
     description = Column(String(250), nullable=True)
-    items = relationship("Item", backref="Category", cascade="all, delete-orphan")
+    items = relationship("Item",
+                         backref="Category",
+                         cascade="all, delete-orphan")
     author_id = Column(Integer, ForeignKey('users.id'))
     author = relationship('User')
 
@@ -44,7 +46,9 @@ class Item(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(80), nullable=False, unique=True)
     description = Column(String(250), nullable=True)
-    image_name = Column(String(250), nullable=False, default='no-image-large.png')
+    image_name = Column(String(250),
+                        nullable=False,
+                        default='no-image-large.png')
     category_id = Column(Integer, ForeignKey('categories.id'))
     category = relationship('Category')
     author_id = Column(Integer, ForeignKey('users.id'))
