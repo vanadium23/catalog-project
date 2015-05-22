@@ -45,6 +45,7 @@ def index():
 
 @app.route('/login')
 def login():
+    """Login view from lessons of OAuth"""
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
@@ -147,6 +148,7 @@ def category_update(category_name):
 
 @app.route('/catalog/<category_name>/delete', methods=['POST'])
 def category_delete(category_name):
+    """Delete Category will all items in it"""
     if 'username' not in login_session:
         return redirect(url_for('login'))
     category = Category.query.filter(Category.name == category_name).first()
@@ -167,8 +169,12 @@ def category_delete(category_name):
 
 @app.route('/catalog/<category_name>/item/new', methods=['GET'])
 def item_create(category_name):
+    """Create new item in category (only for author)"""
     if 'username' not in login_session:
         return redirect(url_for('login'))
+    category = Category.query.filter(Category.name == category_name).first()
+    if category.author_id != login_session['user_id']:
+        return render_template('401.html', name='item')
     form = ItemForm()
     return render_template('item/create.html',
                            form=form,
@@ -177,12 +183,15 @@ def item_create(category_name):
 
 @app.route('/catalog/<category_name>/item', methods=['POST'])
 def item_store(category_name):
+    """Store new item in DB"""
     if 'username' not in login_session:
         return redirect(url_for('login'))
+    category = Category.query.filter(Category.name == category_name).first()
+    if category.author_id != login_session['user_id']:
+        return render_template('401.html', name='item')
     form = ItemForm()
     form.category_id.choices = [(c.id, c.name)
                                 for c in Category.query.order_by('name')]
-    category = Category.query.filter(Category.name == category_name).first()
     form.category_id.data = category.id
     if form.validate_on_submit():
         try:
@@ -211,6 +220,7 @@ def item_store(category_name):
 
 @app.route('/catalog/<category_name>/item/<item_name>', methods=['GET'])
 def item_view(category_name, item_name):
+    """View item with author and description"""
     item = Item.query.\
         filter(Item.name == item_name).\
         filter(Item.category.has(name=category_name)).\
@@ -222,6 +232,7 @@ def item_view(category_name, item_name):
 
 @app.route('/catalog/<category_name>/item/<item_name>/edit', methods=['GET'])
 def item_edit(category_name, item_name):
+    """Edit item but only for author"""
     if 'username' not in login_session:
         return redirect(url_for('login'))
     item = Item.query.\
@@ -247,6 +258,7 @@ def item_edit(category_name, item_name):
 @app.route('/catalog/<category_name>/item/<item_name>/update',
            methods=['POST'])
 def item_update(category_name, item_name):
+    """Update item in DB"""
     if 'username' not in login_session:
         return redirect(url_for('login'))
     item = Item.query.\
@@ -289,6 +301,7 @@ def item_update(category_name, item_name):
 @app.route('/catalog/<category_name>/item/<item_name>/delete',
            methods=['POST'])
 def item_delete(category_name, item_name):
+    """Delete item from DB"""
     if 'username' not in login_session:
         return redirect(url_for('login'))
     item = Item.query.\
@@ -310,6 +323,7 @@ def item_delete(category_name, item_name):
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
+    """Function to login via google plus"""
     # Validate state token
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
@@ -420,6 +434,7 @@ def getUserID(email):
 
 @app.route('/gdisconnect')
 def gdisconnect():
+    """Function to login via google plus"""
     # Only disconnect a connected user.
     credentials = login_session.get('credentials')
     if credentials is None:
@@ -452,12 +467,14 @@ def gdisconnect():
 
 @app.route('/catalog.json')
 def categories_json():
+    """Request catalog with json represantation"""
     categories = Category.query.all()
     return jsonify(Categories=[c.to_json for c in categories])
 
 
 @app.route('/catalog/<category_name>.json')
 def category_json(category_name):
+    """Request category with json represantation"""
     category = Category.query.\
         filter(Category.name == category_name).\
         first()
@@ -466,6 +483,7 @@ def category_json(category_name):
 
 @app.route('/catalog/<category_name>/item/<item_name>.json')
 def item_json(category_name, item_name):
+    """Request item with json represantation"""
     item = Item.query.\
         filter(Item.name == item_name).\
         filter(Item.category.has(name=category_name)).\
@@ -475,6 +493,7 @@ def item_json(category_name, item_name):
 
 @app.route('/catalog.xml')
 def categories_xml():
+    """Request catalog with xml represantation"""
     categories = Category.query.all()
     xml = render_template('xml/categories.xml',
                           categories=categories)
@@ -485,6 +504,7 @@ def categories_xml():
 
 @app.route('/catalog/<category_name>.xml')
 def category_xml(category_name):
+    """Request category with xml represantation"""
     category = Category.query.\
         filter(Category.name == category_name).\
         first()
@@ -497,6 +517,7 @@ def category_xml(category_name):
 
 @app.route('/catalog/<category_name>/item/<item_name>.xml')
 def item_xml(category_name, item_name):
+    """Request item with xml represantation"""
     item = Item.query.\
         filter(Item.name == item_name).\
         filter(Item.category.has(name=category_name)).\

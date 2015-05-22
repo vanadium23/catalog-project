@@ -4,6 +4,7 @@ from app.database import Base
 
 
 class User(Base):
+    """This is an ORM model for logging users"""
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
@@ -13,7 +14,7 @@ class User(Base):
 
 
 class Category(Base):
-
+    """This is an ORM model for our categories"""
     __tablename__ = 'categories'
 
     id = Column(Integer, primary_key=True)
@@ -41,6 +42,7 @@ class Category(Base):
 
 
 class Item(Base):
+    """This is an ORM model for our items"""
     __tablename__ = 'items'
 
     id = Column(Integer, primary_key=True)
